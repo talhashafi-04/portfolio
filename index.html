@@ -23,10 +23,11 @@
 <meta property="og:url" content="https://talhashafi.vercel.app/">
 <meta property="og:site_name" content="Muhammad Talha Shafi — Portfolio">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://talhashafi.vercel.app/og-image.png">
+<meta property="og:image" content="https://talhashafi.vercel.app/profile-photo.jpg">
 <meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
+<meta property="og:image:height" content="1200">
 <meta property="og:image:alt" content="Muhammad Talha Shafi — AI Engineer & Backend Developer at FAST-NUCES">
+<link rel="image_src" href="https://talhashafi.vercel.app/profile-photo.jpg">
 <meta property="profile:first_name" content="Muhammad Talha">
 <meta property="profile:last_name" content="Shafi">
 <meta property="profile:username" content="talhashafi-04">
@@ -37,7 +38,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Muhammad Talha Shafi — AI Engineer & Backend Developer">
 <meta name="twitter:description" content="CS Undergrad @ FAST-NUCES '27 · ICPC 2025 National 21st · CTO at Identiti SaaS · FastAPI · LangGraph · CUDA">
-<meta name="twitter:image" content="https://talhashafi.vercel.app/og-image.png">
+<meta name="twitter:image" content="https://talhashafi.vercel.app/profile-photo.jpg">
 <meta name="twitter:image:alt" content="Muhammad Talha Shafi Portfolio">
 
 <!-- ============================================================
@@ -60,7 +61,13 @@
   "alternateName": ["Talha Shafi", "M. Talha Shafi", "talhashafi-04"],
   "description": "Computer Science undergraduate at FAST-NUCES Islamabad, AI Systems Engineer, Backend Developer, and competitive programmer. ICPC 2025 Regional 21st in Pakistan. Co-founder and CTO of Identiti, an AI-powered Brand Intelligence SaaS.",
   "url": "https://talhashafi.vercel.app/",
-  "image": "https://talhashafi.vercel.app/og-image.png",
+  "image": {
+    "@type": "ImageObject",
+    "url": "https://talhashafi.vercel.app/profile-photo.jpg",
+    "width": 1200,
+    "height": 1200,
+    "caption": "Muhammad Talha Shafi — FAST-NUCES Islamabad"
+  },
   "email": "m.talhashafi2004@gmail.com",
   "telephone": "+923185988008",
   "nationality": "Pakistani",
@@ -254,7 +261,10 @@
     color: var(--text);
     font-family: var(--font-body);
     overflow-x: hidden;
-    cursor: none;
+    cursor: auto;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    body { cursor: none; }
   }
 
   /* CUSTOM CURSOR */
@@ -272,6 +282,9 @@
     border-radius: 50%; pointer-events: none; z-index: 9998;
     transform: translate(-50%, -50%);
     transition: transform 0.12s cubic-bezier(.25,.46,.45,.94), width 0.3s, height 0.3s, border-color 0.3s;
+  }
+  @media not all and (hover: hover) and (pointer: fine) {
+    .cursor, .cursor-ring { display: none !important; }
   }
 
   ::-webkit-scrollbar { width: 3px; }
@@ -292,7 +305,7 @@
     font-family: var(--font-mono); font-size: 14px; color: var(--gold);
     letter-spacing: 0.1em; text-decoration: none;
   }
-  .nav-links { display: flex; gap: 40px; list-style: none; }
+  .nav-links { display: flex; align-items: center; flex-wrap: wrap; gap: 40px; list-style: none; }
   .nav-links a {
     font-family: var(--font-mono); font-size: 12px; color: var(--muted);
     text-decoration: none; letter-spacing: 0.1em; text-transform: uppercase;
@@ -304,6 +317,48 @@
   }
   .nav-links a:hover { color: var(--gold); }
   .nav-links a:hover::after { width: 100%; }
+
+  .nav-doc-btn {
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em;
+    text-transform: uppercase; text-decoration: none;
+    padding: 5px 12px; border-radius: 2px;
+    border: 1px solid; transition: all 0.2s;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .nav-doc-btn::after { display: none !important; }
+  .nav-doc-btn-resume { color: var(--gold); border-color: rgba(212,169,106,0.35); background: rgba(212,169,106,0.06); }
+  .nav-doc-btn-resume:hover { background: rgba(212,169,106,0.14); color: var(--gold) !important; transform: translateY(-1px); }
+  .nav-doc-btn-cv { color: var(--cyan); border-color: rgba(56,232,216,0.3); background: rgba(56,232,216,0.05); }
+  .nav-doc-btn-cv:hover { background: rgba(56,232,216,0.12); color: var(--cyan) !important; transform: translateY(-1px); }
+
+  .profile-photo-wrap {
+    position: relative; display: inline-block;
+    margin-bottom: 32px;
+  }
+  .profile-photo {
+    width: 220px; height: 220px; object-fit: cover; object-position: center top;
+    border-radius: 4px;
+    border: 1px solid rgba(212,169,106,0.2);
+    filter: grayscale(15%) contrast(1.05);
+    display: block;
+    transition: filter 0.4s, transform 0.4s;
+  }
+  .profile-photo:hover { filter: grayscale(0%) contrast(1.08); transform: scale(1.02); }
+  .profile-photo-wrap::before {
+    content: ''; position: absolute;
+    inset: -6px; border-radius: 6px;
+    border: 1px solid rgba(212,169,106,0.12);
+    pointer-events: none;
+  }
+  .profile-photo-wrap::after {
+    content: ''; position: absolute;
+    bottom: -8px; right: -8px;
+    width: 60px; height: 60px;
+    border-right: 2px solid var(--gold);
+    border-bottom: 2px solid var(--gold);
+    border-radius: 0 0 4px 0;
+    pointer-events: none;
+  }
 
   #hero {
     min-height: 100vh; display: flex; align-items: center;
@@ -607,7 +662,7 @@
 
   @media (max-width: 900px) {
     nav { padding: 16px 24px; }
-    .nav-links { gap: 20px; }
+    .nav-links { gap: 12px 16px; }
     section { padding: 80px 24px; }
     #hero { padding: 100px 24px 80px; }
     .hero-stats { display: none; }
@@ -645,6 +700,8 @@
     <li><a href="#achievements">Honors</a></li>
     <li><a href="#github">GitHub</a></li>
     <li><a href="#contact">Contact</a></li>
+    <li><a href="Resume.pdf" target="_blank" rel="noopener" class="nav-doc-btn nav-doc-btn-resume" aria-label="Download Resume PDF">↓ Resume</a></li>
+    <li><a href="CV.pdf" target="_blank" rel="noopener" class="nav-doc-btn nav-doc-btn-cv" aria-label="Download CV PDF">↓ CV</a></li>
   </ul>
 </nav>
 
@@ -763,6 +820,18 @@
     </div>
 
     <div>
+      <div class="profile-photo-wrap reveal">
+        <img
+          src="profile-photo.jpg"
+          alt="Muhammad Talha Shafi — AI Engineer and Backend Developer at FAST-NUCES Islamabad"
+          class="profile-photo"
+          itemprop="image"
+          width="220"
+          height="220"
+          loading="eager"
+          fetchpriority="high"
+        >
+      </div>
       <div class="stats-grid reveal reveal-delay-2">
         <div class="stat-card">
           <div class="stat-num" data-count="3.54" data-decimal="true">0</div>
@@ -1172,36 +1241,38 @@
 </footer>
 
 <script>
-  // CUSTOM CURSOR
+  // CUSTOM CURSOR (desktop / fine pointer only)
   const cursor = document.getElementById('cursor');
   const cursorRing = document.getElementById('cursorRing');
-  let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
-  document.addEventListener('mousemove', e => {
-    mouseX = e.clientX; mouseY = e.clientY;
-    cursor.style.left = mouseX + 'px';
-    cursor.style.top = mouseY + 'px';
-  });
-  function animateRing() {
-    ringX += (mouseX - ringX) * 0.12;
-    ringY += (mouseY - ringY) * 0.12;
-    cursorRing.style.left = ringX + 'px';
-    cursorRing.style.top = ringY + 'px';
-    requestAnimationFrame(animateRing);
-  }
-  animateRing();
+  if (cursor && cursorRing && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
+    document.addEventListener('mousemove', e => {
+      mouseX = e.clientX; mouseY = e.clientY;
+      cursor.style.left = mouseX + 'px';
+      cursor.style.top = mouseY + 'px';
+    });
+    function animateRing() {
+      ringX += (mouseX - ringX) * 0.12;
+      ringY += (mouseY - ringY) * 0.12;
+      cursorRing.style.left = ringX + 'px';
+      cursorRing.style.top = ringY + 'px';
+      requestAnimationFrame(animateRing);
+    }
+    animateRing();
 
-  document.querySelectorAll('a, button').forEach(el => {
-    el.addEventListener('mouseenter', () => {
-      cursor.style.transform = 'translate(-50%,-50%) scale(2)';
-      cursorRing.style.transform = 'translate(-50%,-50%) scale(1.5)';
-      cursorRing.style.borderColor = 'rgba(56,232,216,0.6)';
+    document.querySelectorAll('a, button').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        cursor.style.transform = 'translate(-50%,-50%) scale(2)';
+        cursorRing.style.transform = 'translate(-50%,-50%) scale(1.5)';
+        cursorRing.style.borderColor = 'rgba(56,232,216,0.6)';
+      });
+      el.addEventListener('mouseleave', () => {
+        cursor.style.transform = 'translate(-50%,-50%) scale(1)';
+        cursorRing.style.transform = 'translate(-50%,-50%) scale(1)';
+        cursorRing.style.borderColor = 'rgba(212,169,106,0.5)';
+      });
     });
-    el.addEventListener('mouseleave', () => {
-      cursor.style.transform = 'translate(-50%,-50%) scale(1)';
-      cursorRing.style.transform = 'translate(-50%,-50%) scale(1)';
-      cursorRing.style.borderColor = 'rgba(212,169,106,0.5)';
-    });
-  });
+  }
 
   // NAV SCROLL
   const navbar = document.getElementById('navbar');
