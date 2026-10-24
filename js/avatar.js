@@ -21,7 +21,7 @@
   const PATHS = {
     wide: [
       [V(0, 1.42, 2.35), V(0, 1.3, -0.3), 22],
-      [V(0.55, 1.42, 2.35), V(0.6, 1.3, -0.3), 22],
+      [V(0.5, 1.42, 2.6), V(0.48, 1.3, -0.3), 22],
       [V(-3.5, 2.15, 3.7), V(0.15, 0.82, 0.95), 24]
     ],
     tall: [
@@ -133,7 +133,14 @@
   function load(onProgress) {
     return loadBytes(onProgress).then((bin) => new Promise((resolve, reject) => {
       new THREE.GLTFLoader().parse(bin.buffer.slice(bin.byteOffset, bin.byteOffset + bin.byteLength), "", (g) => {
-        g.scene.traverse((o) => { if (o.material) o.material.envMapIntensity = 0.3; o.frustumCulled = false; });
+        const aniso = renderer.capabilities.getMaxAnisotropy();
+        g.scene.traverse((o) => {
+          o.frustumCulled = false;
+          if (!o.material) return;
+          o.material.envMapIntensity = 0.3;
+          // full-res textures stay crisp at grazing angles in the close-up
+          for (const k of ["map", "normalMap", "roughnessMap", "metalnessMap"]) if (o.material[k]) o.material[k].anisotropy = aniso;
+        });
         scene.add(g.scene);
         neck = g.scene.getObjectByName("mixamorigNeck");
         head = g.scene.getObjectByName("mixamorigHead");
@@ -158,12 +165,16 @@
       mixer.update(dt);
       const k = 1 - Math.exp(-dt * 6);
       // in the about pose the camera sits to his right, so bias the gaze toward the reader
-      // in the wide shot he goes back to his screen; in the about pose he glances toward the text
-      const follow = 1 - wideness;
-      look.x += ((look.tx + Math.min(progress, 1) * 0.35) * follow - look.x) * k;
-      look.y += ((look.ty * follow + wideness * 0.5) - look.y) * k;
+      // cursor-follow only in the untouched hero; once the page scrolls he locks onto the text on the
+      // right (About, then What I do's cards), and in the wide shot he drops his eyes to the laptop
+      const lock = Math.min(1, progress / 0.15);
+      const follow = 1 - lock;
+      const gx = look.tx * follow + lock * 0.75 * (1 - wideness);
+      const gy = look.ty * follow + lock * (0.05 + wideness * 0.45);
+      look.x += (gx - look.x) * k;
+      look.y += (gy - look.y) * k;
       // close-up: lift his chin off the keyboard so he meets the viewer
-      const yaw = look.x * 0.6, pitch = look.y * 0.28 - 0.04 - 0.2 * follow;
+      const yaw = look.x * 0.6, pitch = look.y * 0.28 - 0.04 - 0.2 * (1 - wideness);
       if (neck) turn(neck, yaw * 0.4, pitch * 0.4);
       if (head) turn(head, yaw * 0.6, pitch * 0.6);
     }
