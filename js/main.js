@@ -139,21 +139,27 @@
   }
 
   /* ---------- scroll: camera + stage visibility ---------- */
-  ScrollTrigger.create({
-    trigger: "#about", start: "top bottom", end: "center center", scrub: true,
-    onUpdate: (s) => Avatar.setProgress(s.progress)
-  });
+  // one camera value across three sections: 0 hero close-up, 1 about (he slides left), 2 wide shot at the desk
+  const cam = { a: 0, b: 0 };
+  const pushCam = () => Avatar.setProgress(cam.a + cam.b);
+  ScrollTrigger.create({ trigger: "#about", start: "top bottom", end: "center center", scrub: true, onUpdate: (s) => { cam.a = s.progress; pushCam(); } });
+  ScrollTrigger.create({ trigger: "#whatido", start: "top 95%", end: "top 10%", scrub: true, onUpdate: (s) => { cam.b = s.progress; pushCam(); } });
   let nodded = false;
   ScrollTrigger.create({ trigger: "#about", start: "top 40%", onEnter: () => { if (!nodded) { nodded = true; Avatar.play("nod"); } } });
-  gsap.to(["#stage", ".glow-a"], {
-    opacity: 0, ease: "none",
+  // he stays put through What I do, then rides up and out with the page as Career arrives
+  gsap.fromTo(["#stage", ".glow-a"], { y: 0 }, {
+    y: () => -innerHeight, ease: "none", immediateRender: false,
     scrollTrigger: {
-      trigger: "#whatido", start: "top 85%", end: "top 25%", scrub: true,
+      trigger: "#career", start: "top bottom", end: "top top", scrub: true, invalidateOnRefresh: true,
       onLeave: () => Avatar.setRunning(false), onEnterBack: () => Avatar.setRunning(true)
     }
   });
+  gsap.to(".about-inner", {
+    opacity: 0, y: -40, filter: "blur(6px)", ease: "none",
+    scrollTrigger: { trigger: "#about", start: "bottom 75%", end: "bottom 30%", scrub: true }
+  });
   gsap.to(".hero-left, .hero-right, .scroll-hint", {
-    opacity: 0, y: -60, ease: "none",
+    opacity: 0, y: -60, filter: "blur(8px)", ease: "none",
     scrollTrigger: { trigger: "#about", start: "top 95%", end: "top 45%", scrub: true }
   });
 

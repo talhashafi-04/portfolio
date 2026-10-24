@@ -140,11 +140,12 @@ section { position: relative; padding: 0 var(--gutter); }
 .facts span { font: 11px var(--mono); color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
 
 /* ---------- what i do ---------- */
-.whatido { padding-top: 18vh; padding-bottom: 14vh; }
-.do-grid { margin-top: 56px; display: grid; grid-template-columns: 1fr 1fr; gap: clamp(16px, 3vw, 40px); }
+.whatido { min-height: 170vh; padding-top: 14vh; padding-bottom: 20vh; display: grid; grid-template-columns: 1fr minmax(0, 520px); grid-template-rows: auto 1fr; column-gap: 40px; align-items: start; }
+.whatido .big-title { grid-column: 1 / -1; }
+.do-grid { grid-column: 2; margin-top: 18vh; display: grid; gap: clamp(16px, 3vw, 40px); }
 .do-card {
-  position: relative; padding: clamp(28px, 3.5vw, 52px); min-height: 380px;
-  border: 1px dashed var(--line); background: linear-gradient(160deg, rgba(194,160,255,0.04), transparent 60%);
+  position: relative; padding: clamp(28px, 3.5vw, 52px);
+  border: 1px dashed var(--line); background: linear-gradient(160deg, rgba(194,160,255,0.06), rgba(11,8,12,.55) 60%); backdrop-filter: blur(3px);
   display: flex; flex-direction: column; transition: background .4s, border-color .4s;
 }
 .do-card:hover, .do-card:focus-visible { background: linear-gradient(160deg, rgba(194,160,255,0.12), transparent 70%); border-color: rgba(194,160,255,.4); }
@@ -282,7 +283,8 @@ section { position: relative; padding: 0 var(--gutter); }
   .about { grid-template-columns: 1fr; min-height: auto; padding-top: 30vh; padding-bottom: 12vh; }
   .about-inner { grid-column: 1; padding: 28px 0; }
   .facts { grid-template-columns: repeat(2, 1fr); row-gap: 14px; }
-  .do-grid { grid-template-columns: 1fr; }
+  .whatido { display: block; min-height: 0; }
+  .do-grid { margin-top: 40px; }
   .do-card { min-height: 0; }
   .timeline { gap: 44px; }
   .tl-line { left: 6px; transform: none; }

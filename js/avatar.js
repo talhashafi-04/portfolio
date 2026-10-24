@@ -1,5 +1,5 @@
 // The seated avatar: three.js scene, GLB loading with progress, head follows the cursor,
-// and a camera that main.js drives between "hero" and "about" with a 0..1 scroll value.
+// and a camera that main.js drives along hero -> about -> wide desk shot with a 0..2 scroll value.
 (function () {
   const canvas = document.getElementById("stage");
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
@@ -15,45 +15,59 @@
 
   const cam = new THREE.PerspectiveCamera(22, 1, 0.05, 50);
 
-  // camera poses: [position, look-at target]; mobile gets its own so the desk fits a tall screen
-  const POSES = {
-    wide: {
-      hero: [new THREE.Vector3(0, 1.42, 3.9), new THREE.Vector3(0, 1.0, -0.3)],
-      about: [new THREE.Vector3(1.45, 1.5, 3.7), new THREE.Vector3(0.78, 1.08, -0.3)]
-    },
-    tall: {
-      hero: [new THREE.Vector3(0, 1.55, 5.4), new THREE.Vector3(0, 1.5, -0.3)],
-      about: [new THREE.Vector3(0, 1.75, 4.6), new THREE.Vector3(0, 1.45, -0.3)]
-    }
+  // camera path: hero close-up -> about (same close-up, he slides left) -> wide 3/4 shot at the desk.
+  // each pose is [position, look-at target, fov]; phones get their own path so the desk fits a tall screen
+  const V = (x, y, z) => new THREE.Vector3(x, y, z);
+  const PATHS = {
+    wide: [
+      [V(0, 1.42, 2.35), V(0, 1.3, -0.3), 22],
+      [V(0.55, 1.42, 2.35), V(0.6, 1.3, -0.3), 22],
+      [V(-3.5, 2.15, 3.7), V(0.15, 0.82, 0.95), 24]
+    ],
+    tall: [
+      [V(0, 1.55, 5.4), V(0, 1.5, -0.3), 26],
+      [V(0, 1.75, 4.6), V(0, 1.45, -0.3), 26],
+      [V(-3.6, 2.2, 3.6), V(0, 1.15, 0.25), 30]
+    ]
   };
-  let pose = POSES.wide, progress = 0, intro = 1;
+  let path = PATHS.wide, progress = 0, goal = 0, intro = 1, wideness = 0;
   const pTmp = new THREE.Vector3(), tTmp = new THREE.Vector3();
 
   function size() {
     const w = innerWidth, h = innerHeight;
     renderer.setSize(w, h, false);
     cam.aspect = w / h;
-    pose = cam.aspect < 0.9 ? POSES.tall : POSES.wide;
-    cam.fov = cam.aspect < 0.9 ? 26 : 22;
-    cam.updateProjectionMatrix();
+    path = cam.aspect < 0.9 ? PATHS.tall : PATHS.wide;
   }
   addEventListener("resize", size);
   size();
 
+  const ease = (x) => x * x * (3 - 2 * x);
   function placeCamera() {
-    const e = progress * progress * (3 - 2 * progress);
-    pTmp.lerpVectors(pose.hero[0], pose.about[0], e);
-    tTmp.lerpVectors(pose.hero[1], pose.about[1], e);
-    // intro: start a little further back and higher, then settle in
-    pTmp.z += intro * 1.2; pTmp.y += intro * 0.35;
+    const seg = Math.min(Math.floor(progress), path.length - 2);
+    const e = ease(Math.min(1, progress - seg));
+    const A = path[seg], B = path[seg + 1];
+    // orbit around him (cylindrical lerp) instead of cutting straight across, so he never leaves frame
+    const a0 = Math.atan2(A[0].x, A[0].z), a1 = Math.atan2(B[0].x, B[0].z);
+    const r0 = Math.hypot(A[0].x, A[0].z), r1 = Math.hypot(B[0].x, B[0].z);
+    const ang = a0 + (a1 - a0) * e, rad = r0 + (r1 - r0) * e;
+    pTmp.set(Math.sin(ang) * rad, A[0].y + (B[0].y - A[0].y) * e, Math.cos(ang) * rad);
+    tTmp.lerpVectors(A[1], B[1], e);
+    cam.fov = A[2] + (B[2] - A[2]) * e;
+    wideness = seg === 1 ? e : 0;
+    // intro: start pulled back and higher, then dolly in to the close-up
+    pTmp.z += intro * 1.6; pTmp.y += intro * 0.3;
     cam.position.copy(pTmp);
     cam.lookAt(tTmp);
+    cam.updateProjectionMatrix();
   }
 
   const key = new THREE.DirectionalLight(0xfff6f0, 1.25); key.position.set(-0.5, 2.5, 2); scene.add(key);
   const rim = new THREE.PointLight(0xc2a0ff, 3, 6, 2); rim.position.set(0.9, 1.7, -0.6); scene.add(rim);
   const rim2 = new THREE.PointLight(0xc2a0ff, 2, 6, 2); rim2.position.set(-0.9, 1.5, -0.5); scene.add(rim2);
   const scr = new THREE.PointLight(0xc8bfff, 1.4, 2, 2); scr.position.set(0, 0.95, -0.75); scene.add(scr);
+  // back light behind his head and shoulders for the lilac outline
+  const back = new THREE.SpotLight(0xb98cff, 22, 7, 0.7, 0.6, 2); back.position.set(0, 2.3, -1.6); back.target.position.set(0, 1.2, 0); scene.add(back, back.target);
 
   let mixer, actions = {}, current, neck, head;
   const look = { x: 0, y: 0, tx: 0, ty: 0 };
@@ -144,12 +158,17 @@
       mixer.update(dt);
       const k = 1 - Math.exp(-dt * 6);
       // in the about pose the camera sits to his right, so bias the gaze toward the reader
-      look.x += (look.tx + progress * 0.35 - look.x) * k;
-      look.y += (look.ty - look.y) * k;
-      const yaw = look.x * 0.6, pitch = look.y * 0.28 - 0.04;
+      // in the wide shot he goes back to his screen; in the about pose he glances toward the text
+      const follow = 1 - wideness;
+      look.x += ((look.tx + Math.min(progress, 1) * 0.35) * follow - look.x) * k;
+      look.y += ((look.ty * follow + wideness * 0.5) - look.y) * k;
+      // close-up: lift his chin off the keyboard so he meets the viewer
+      const yaw = look.x * 0.6, pitch = look.y * 0.28 - 0.04 - 0.2 * follow;
       if (neck) turn(neck, yaw * 0.4, pitch * 0.4);
       if (head) turn(head, yaw * 0.6, pitch * 0.6);
     }
+    // ease toward the scroll value so wheel steps don't jolt the camera
+    progress += (goal - progress) * (1 - Math.exp(-dt * 7));
     placeCamera();
     renderer.render(scene, cam);
   }
@@ -158,7 +177,7 @@
   window.Avatar = {
     load,
     play,
-    setProgress(p) { progress = Math.max(0, Math.min(1, p)); },
+    setProgress(p) { goal = Math.max(0, Math.min(2, p)); },
     setIntro(v) { intro = v; },
     setRunning(on) { if (on && !running) clock.getDelta(); running = on; },
     canvas
