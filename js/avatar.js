@@ -71,6 +71,7 @@
   const back = new THREE.SpotLight(0xb98cff, 22, 7, 0.7, 0.6, 2); back.position.set(0, 2.3, -1.6); back.target.position.set(0, 1.2, 0); scene.add(back, back.target);
 
   let mixer, actions = {}, current, neck, head;
+  const screens = [];
   const look = { x: 0, y: 0, tx: 0, ty: 0 };
   const qTmp = new THREE.Quaternion(), qParent = new THREE.Quaternion(), qDelta = new THREE.Quaternion();
   const eTmp = new THREE.Euler();
@@ -140,6 +141,8 @@
         g.scene.traverse((o) => {
           o.frustumCulled = false;
           if (!o.material) return;
+          // the monitor and phone sit between him and the close-up camera, so they fade in during the orbit
+          if (/^(Monitor|Phone)/.test(o.name)) { o.material = o.material.clone(); o.material.transparent = true; screens.push(o); }
           o.material.envMapIntensity = 0.3;
           // full-res textures stay crisp at grazing angles in the close-up
           for (const k of ["map", "normalMap", "roughnessMap", "metalnessMap"]) if (o.material[k]) o.material[k].anisotropy = aniso;
@@ -186,6 +189,8 @@
     }
     // ease toward the scroll value so wheel steps don't jolt the camera
     progress += (goal - progress) * (1 - Math.exp(-dt * 7));
+    const show = Math.max(0, Math.min(1, (progress - 1.05) / 0.4));
+    for (const o of screens) { o.material.opacity = show; o.visible = show > 0.01; }
     placeCamera();
     renderer.render(scene, cam);
   }
