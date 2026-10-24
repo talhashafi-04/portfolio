@@ -30,6 +30,7 @@
       [V(-3.6, 2.2, 3.6), V(0, 1.15, 0.25), 30]
     ]
   };
+  let gazeEl = null;
   let path = PATHS.wide, progress = 0, goal = 0, intro = 1, wideness = 0;
   const pTmp = new THREE.Vector3(), tTmp = new THREE.Vector3();
 
@@ -167,12 +168,15 @@
       mixer.update(dt);
       const k = 1 - Math.exp(-dt * 6);
       // in the about pose the camera sits to his right, so bias the gaze toward the reader
-      // cursor-follow only in the untouched hero; once the page scrolls he locks onto the text on the
-      // right (About, then What I do's cards), and in the wide shot he drops his eyes to the laptop
+      // cursor-follow only in the untouched hero; once the page scrolls he faces the text on the right,
+      // and in the wide shot he drops his eyes to the laptop
       const lock = Math.min(1, progress / 0.15);
       const follow = 1 - lock;
       const gx = look.tx * follow + lock * 0.75 * (1 - wideness);
-      const gy = look.ty * follow + lock * (0.05 + wideness * 0.45);
+      // vertically he tracks the text block as it scrolls past, from bottom right up to top right
+      let ty = 0.05;
+      if (gazeEl) { const r = gazeEl.getBoundingClientRect(); ty = Math.max(-1, Math.min(1, ((r.top + r.height * 0.35) / innerHeight) * 2 - 1)); }
+      const gy = look.ty * follow + lock * (ty * (1 - wideness) + wideness * 0.5);
       look.x += (gx - look.x) * k;
       look.y += (gy - look.y) * k;
       // close-up: lift his chin off the keyboard so he meets the viewer
@@ -192,6 +196,7 @@
     play,
     setProgress(p) { goal = Math.max(0, Math.min(2, p)); },
     setIntro(v) { intro = v; },
+    setGazeTarget(el) { gazeEl = el; },
     setRunning(on) { if (on && !running) clock.getDelta(); running = on; },
     canvas
   };

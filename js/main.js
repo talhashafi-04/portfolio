@@ -144,6 +144,7 @@
   const pushCam = () => Avatar.setProgress(cam.a + cam.b);
   ScrollTrigger.create({ trigger: "#about", start: "top bottom", end: "center center", scrub: true, onUpdate: (s) => { cam.a = s.progress; pushCam(); } });
   ScrollTrigger.create({ trigger: "#whatido", start: "top 95%", end: "top 10%", scrub: true, onUpdate: (s) => { cam.b = s.progress; pushCam(); } });
+  Avatar.setGazeTarget($(".about-inner"));
   let nodded = false;
   ScrollTrigger.create({ trigger: "#about", start: "top 40%", onEnter: () => { if (!nodded) { nodded = true; Avatar.play("nod"); } } });
   // he stays put through What I do, then rides up and out with the page as Career arrives
