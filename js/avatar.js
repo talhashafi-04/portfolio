@@ -132,7 +132,9 @@
 
   function load(onProgress) {
     return loadBytes(onProgress).then((bin) => new Promise((resolve, reject) => {
-      new THREE.GLTFLoader().parse(bin.buffer.slice(bin.byteOffset, bin.byteOffset + bin.byteLength), "", (g) => {
+      const loader = new THREE.GLTFLoader();
+      if (window.MeshoptDecoder) loader.setMeshoptDecoder(MeshoptDecoder);
+      loader.parse(bin.buffer.slice(bin.byteOffset, bin.byteOffset + bin.byteLength), "", (g) => {
         const aniso = renderer.capabilities.getMaxAnisotropy();
         g.scene.traverse((o) => {
           o.frustumCulled = false;
