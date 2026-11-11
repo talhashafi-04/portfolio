@@ -1,0 +1,13 @@
+{
+  "name": "Talha Shafi",
+  "short_name": "Talha Shafi",
+  "description": "Portfolio of Talha Shafi (Muhammad Talha Shafi), backend and AI systems engineer.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b080c",
+  "theme_color": "#0b080c",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
