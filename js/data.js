@@ -20,11 +20,35 @@ window.PROJECTS = [
     link: GH
   },
   {
+    name: "Baton", cat: "Hackathon · Oct 2026", hue: 45,
+    stat: "2nd", statNote: "of 70+ teams, NaSCon '26",
+    code: "SELECT * FROM leads\n WHERE ack_due < now()\n FOR UPDATE SKIP LOCKED;",
+    tools: "React, TypeScript, Supabase (PostgreSQL), Deno, Stripe",
+    blurb: "A multi-tenant CRM that guarantees every inbound lead gets a human reply. Unanswered leads escalate down an on-call chain over WhatsApp and Telegram, with the engine running inside PostgreSQL for exactly-once hand-offs.",
+    link: "https://nascon26-webdev.vercel.app"
+  },
+  {
     name: "Identiti", cat: "GenAI SaaS · 2026", hue: 300,
-    stat: "async", statNote: "brand-aware generation",
+    stat: "live", statNote: "at identiti.studio",
     code: "await asyncio.gather(*[\n  gemini.image(prompt, brand)\n  for prompt in batch])",
     tools: "FastAPI, Next.js, Gemini, Supabase, PostgreSQL, Docker",
-    blurb: "A brand-intelligence engine that conditions every post, caption and visual on who the brand is. I'm co-founder and CTO.",
+    blurb: "A brand-learning engine that takes in tone guidelines and past content, then writes platform-specific posts for Instagram, LinkedIn and X. I'm co-founder and CTO.",
+    link: "https://identiti.studio"
+  },
+  {
+    name: "Lumen", cat: "Vision · May 2026", hue: 185,
+    stat: "232 s", statNote: "for a 30-minute video, on CPU",
+    code: "frames = ssim_keyframes(video)\ntext = ocr(clahe(deskew(f)))\nsummary = llm(fuse(stt, text))",
+    tools: "Python, OpenCV, EasyOCR, faster-whisper",
+    blurb: "A 10-stage pipeline that turns lectures and live streams into summaries. Classical image enhancement lifted OCR confidence from 43% to 79% on whiteboards and 61% to 84% on slides.",
+    link: GH
+  },
+  {
+    name: "RishtaAI", cat: "Agents · May 2026", hue: 330,
+    stat: "8", statNote: "agents, Google Hackathon 2026",
+    code: "for agent in orchestra:\n  yield sse(agent.reason(profile))\n# Urdu · Roman Urdu · English",
+    tools: "Gemini, Google Cloud STT, Expo, Node.js, Supabase",
+    blurb: "A multi-agent matchmaking system with a persistent negotiation engine, live reasoning traces over SSE and voice input in three languages. I was technical lead of a five-person team.",
     link: GH
   },
   {
@@ -88,5 +112,6 @@ window.PROJECTS = [
 window.STACK = [
   "Python", "C++", "TypeScript", "FastAPI", "Node.js", "PostgreSQL", "Redis", "Docker",
   "CUDA", "OpenMP", "MPI", "LangGraph", "Gemini", "YOLO", "Next.js", "React",
-  "Flutter", "Azure", "n8n", "Supabase", "Java", "C#", "MongoDB", "Linux"
+  "Flutter", "Azure", "n8n", "Supabase", "Java", "C#", "MongoDB", "Linux",
+  "PyTorch", "OpenCV", "LangChain", "pytest", "GitHub Actions"
 ];
